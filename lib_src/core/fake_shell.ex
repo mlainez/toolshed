@@ -13,7 +13,7 @@ defmodule Toolshed.Core.FakeShell do
       fksh> echo hello
       ...
 
-  The function returns `:ok` when the user types `exit` or when EOF is received.
+  The function returns `:ok` when the user types `exit`.
   """
 
   @prompt "fksh> "
@@ -22,8 +22,7 @@ defmodule Toolshed.Core.FakeShell do
   Start an interactive fake shell session.
 
   The function prints a short banner then enters a read-execute loop.
-  Each non-empty line is passed to `Toolshed.cmd/1`. Type `"exit"` or send EOF
-  (Ctrl+D) to end the session. The function returns `:ok` on exit.
+  Each non-empty line is passed to `Toolshed.cmd/1`. Type `"exit"` to end the session. The function returns `:ok` on exit.
   """
   @spec fake_shell() :: :ok
   def fake_shell() do
