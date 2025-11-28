@@ -1,12 +1,18 @@
+# SPDX-FileCopyrightText: 2025 Marc Lainez
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule Toolshed.Core.FakeShell do
-  @moduledoc """
-  Provides a small interactive fake shell used in tests and local development.
+  @prompt "fksh> "
 
-  The shell reads lines from `IO.gets/1` and delegates command execution
-  to `Toolshed.cmd/1`. It is intended for manual use or lightweight
-  integration testing where an interactive prompt is convenient.
+  @doc """
+  Start an interactive fake shell session.
 
-    Example
+  The shell reads lines from `IO.gets/1` and delegates command execution to
+  `Toolshed.cmd/1`. It is intended for manual use or lightweight integration
+  testing where an interactive prompt is convenient.
+
+   Example
 
       iex> Toolshed.fake_shell()
       Starting fake shell. Type 'exit' to quit.
@@ -15,24 +21,15 @@ defmodule Toolshed.Core.FakeShell do
 
   The function returns `:ok` when the user types `exit`.
   """
-
-  @prompt "fksh> "
-
-  @doc """
-  Start an interactive fake shell session.
-
-  The function prints a short banner then enters a read-execute loop.
-  Each non-empty line is passed to `Toolshed.cmd/1`. Type `"exit"` to end the session. The function returns `:ok` on exit.
-  """
   @spec fake_shell() :: :ok
   def fake_shell() do
     IO.puts("Starting fake shell. Type 'exit' to quit.")
-    loop()
+    fake_shell_loop()
   end
 
-  defp loop do
+  defp fake_shell_loop() do
     case IO.gets(@prompt) do
-      nil ->
+      :eof ->
         :ok
 
       "exit\n" ->
@@ -43,18 +40,17 @@ defmodule Toolshed.Core.FakeShell do
         |> String.trim()
         |> exec()
 
-        loop()
+        fake_shell_loop()
     end
   end
 
   defp exec(""), do: :ok
 
   defp exec(cmdline) do
-    try do
-      Toolshed.cmd(cmdline)
-    rescue
-      e ->
-        IO.puts("error: #{inspect(e)}")
-    end
+    _ = Toolshed.cmd(cmdline)
+    :ok
+  rescue
+    e ->
+      IO.puts("error: #{inspect(e)}")
   end
 end
